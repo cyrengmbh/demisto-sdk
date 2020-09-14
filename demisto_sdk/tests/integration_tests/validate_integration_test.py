@@ -29,11 +29,16 @@ TEST_FILES_PATH = Path(git_path()) / 'demisto_sdk' / 'tests' / 'test_files'
 AZURE_FEED_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzure'
 AZURE_FEED_INVALID_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzureab'
 VALID_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzureValid'
-VALID_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling.yml'
-INVALID_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling_invalid.yml'
-VALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Valid_Deprecated_Playbook.yml'
-INVALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Invalid_Deprecated_Playbook.yml'
-VALID_SCRIPT_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Scripts' / 'EntryWidgetNumberHostsXDR' / 'EntryWidgetNumberHostsXDR.yml'
+VALID_PLAYBOOK_FILE_PATH = Path(
+    TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling.yml'
+INVALID_PLAYBOOK_FILE_PATH = Path(
+    TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling_invalid.yml'
+VALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(
+    TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Valid_Deprecated_Playbook.yml'
+INVALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(
+    TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Invalid_Deprecated_Playbook.yml'
+VALID_SCRIPT_PATH = Path(
+    TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Scripts' / 'EntryWidgetNumberHostsXDR' / 'EntryWidgetNumberHostsXDR.yml'
 
 CONF_JSON_MOCK = {
     "tests": [
@@ -309,11 +314,13 @@ class TestPackValidation:
         mocker.patch.object(ContentEntityValidator, '_load_conf_file', return_value=CONF_JSON_MOCK)
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, "-i", VALID_PACK_PATH, "--no-conf-json"])
-        assert f"{VALID_PACK_PATH} unique pack files" in result.stdout
-        assert f"Validating pack {VALID_PACK_PATH}" in result.stdout
-        assert f"{VALID_PACK_PATH}/Integrations/FeedAzureValid/FeedAzureValid.yml" in result.stdout
-        assert f"{VALID_PACK_PATH}/IncidentFields/incidentfield-city.json" in result.stdout
+        result = runner.invoke(main, [VALIDATE_CMD, "-i", str(VALID_PACK_PATH), "--no-conf-json"])
+        yml_path = VALID_PACK_PATH / "Integrations" / "FeedAzureValid" / "FeedAzureValid.yml"
+        incident_path = VALID_PACK_PATH / "IncidentFields" / "incidentfield-city.json"
+        assert f"{str(VALID_PACK_PATH)} unique pack files" in result.stdout
+        assert f"Validating pack {str(VALID_PACK_PATH)}" in result.stdout
+        assert str(yml_path) in result.stdout
+        assert str(incident_path) in result.stdout
         assert "The files are valid" in result.stdout
         assert result.stderr == ""
 
@@ -332,11 +339,12 @@ class TestPackValidation:
         mocker.patch.object(ContentEntityValidator, '_load_conf_file', return_value=CONF_JSON_MOCK)
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, "-i", AZURE_FEED_PACK_PATH, "--no-conf-json"])
-
-        assert f'{AZURE_FEED_PACK_PATH}' in result.output
-        assert f'{AZURE_FEED_PACK_PATH}/IncidentFields/incidentfield-city.json' in result.output
-        assert f'{AZURE_FEED_PACK_PATH}/Integrations/FeedAzure/FeedAzure.yml' in result.output
+        result = runner.invoke(main, [VALIDATE_CMD, "-i", str(AZURE_FEED_PACK_PATH), "--no-conf-json"])
+        yml_path = AZURE_FEED_PACK_PATH / "Integrations" / "FeedAzure" / "FeedAzure.yml"
+        incident_path = AZURE_FEED_PACK_PATH / "IncidentFields" / "incidentfield-city.json"
+        assert f'{str(AZURE_FEED_PACK_PATH)}' in result.output
+        assert str(yml_path) in result.output
+        assert str(incident_path) in result.output
         assert 'Playbook conditional task with id:15 has an unhandled condition: MAYBE' in result.output
         assert "The files were found as invalid, the exact error message can be located above" in result.stdout
         assert result.stderr == ""
@@ -1220,7 +1228,8 @@ class TestPlaybookValidateDeprecated:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, '-i', INVALID_DEPRECATED_PLAYBOOK_FILE_PATH], catch_exceptions=False)
+        result = runner.invoke(main, [VALIDATE_CMD, '-i', INVALID_DEPRECATED_PLAYBOOK_FILE_PATH],
+                               catch_exceptions=False)
         assert f'Validating {INVALID_DEPRECATED_PLAYBOOK_FILE_PATH} as playbook' in result.stdout
         assert 'PB104' in result.stdout
         assert 'The playbook description has to start with "Deprecated."' in result.stdout
@@ -1391,7 +1400,8 @@ class TestScriptDeprecatedValidation:
         script = pack.create_script(yml=valid_script_yml)
         with ChangeCWD(pack.repo_path):
             runner = CliRunner(mix_stderr=False)
-            result = runner.invoke(main, [VALIDATE_CMD, '-i', script.yml_path, '--no-docker-checks'], catch_exceptions=False)
+            result = runner.invoke(main, [VALIDATE_CMD, '-i', script.yml_path, '--no-docker-checks'],
+                                   catch_exceptions=False)
         assert f'Validating {script.yml_path} as script' in result.stdout
         assert 'The files are valid' in result.stdout
         assert result.exit_code == 0
@@ -1415,7 +1425,8 @@ class TestScriptDeprecatedValidation:
         script = pack.create_script(yml=invalid_script_yml)
         with ChangeCWD(pack.repo_path):
             runner = CliRunner(mix_stderr=False)
-            result = runner.invoke(main, [VALIDATE_CMD, '-i', script.yml_path, '--no-docker-checks'], catch_exceptions=False)
+            result = runner.invoke(main, [VALIDATE_CMD, '-i', script.yml_path, '--no-docker-checks'],
+                                   catch_exceptions=False)
         assert f'Validating {script.yml_path} as script' in result.stdout
         assert 'SC101' in result.stdout
         assert "Deprecated." in result.stdout
@@ -1554,13 +1565,13 @@ class TestAllFilesValidator:
         mocker.patch.object(PackUniqueFilesValidator, 'validate_pack_unique_files', return_value='')
         mocker.patch.object(ValidateManager, 'validate_readme', return_value=True)
         pack1 = repo.create_pack('PackName1')
-        pack_integration_path = join(AZURE_FEED_PACK_PATH, "Integrations/FeedAzure/FeedAzure.yml")
-        valid_integration_yml = get_yaml(pack_integration_path)
+        pack_integration_path = AZURE_FEED_PACK_PATH / "Integrations" / "FeedAzure" / "FeedAzure.yml"
+        valid_integration_yml = get_yaml(str(pack_integration_path))
         integration = pack1.create_integration(yml=valid_integration_yml)
         incident_field = pack1.create_incident_field('incident-field', content=INCIDENT_FIELD)
         dashboard = pack1.create_dashboard('dashboard', content=DASHBOARD)
 
-        valid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        valid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         pack2 = repo.create_pack('PackName2')
         script = pack2.create_script(yml=valid_script_yml)
 
@@ -1595,15 +1606,15 @@ class TestAllFilesValidator:
         mocker.patch.object(ValidateManager, 'validate_readme', return_value=True)
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         pack1 = repo.create_pack('PackName1')
-        pack_integration_path = join(AZURE_FEED_PACK_PATH, "Integrations/FeedAzure/FeedAzure.yml")
-        valid_integration_yml = get_yaml(pack_integration_path)
+        pack_integration_path = AZURE_FEED_PACK_PATH / "Integrations" / "FeedAzure" / "FeedAzure.yml"
+        valid_integration_yml = get_yaml(str(pack_integration_path))
         integration = pack1.create_integration(yml=valid_integration_yml)
         incident_field_copy = INCIDENT_FIELD.copy()
         incident_field_copy['content'] = False
         incident_field = pack1.create_incident_field('incident-field', content=incident_field_copy)
         dashboard = pack1.create_dashboard('dashboard', content=DASHBOARD)
 
-        invalid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        invalid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         invalid_script_yml['name'] = invalid_script_yml['name'] + "_v2"
         pack2 = repo.create_pack('PackName2')
         script = pack2.create_script(yml=invalid_script_yml)
@@ -1746,7 +1757,8 @@ class TestValidationUsingGit:
         """
         pack = repo.create_pack('FeedAzure')
         integration = pack.create_integration(name='FeedAzure',
-                                              yml=str(Path(AZURE_FEED_PACK_PATH) / "Integrations" / "FeedAzure" / "FeedAzure.yml"))
+                                              yml=str(Path(
+                                                  AZURE_FEED_PACK_PATH) / "Integrations" / "FeedAzure" / "FeedAzure.yml"))
         modified_files = {integration.yml.rel_path}
         mocker.patch.object(tools, 'is_external_repository', return_value=False)
         mocker.patch.object(BaseValidator, 'update_checked_flags_by_support_level', return_value=None)
