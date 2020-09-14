@@ -1,4 +1,5 @@
 from os.path import join
+from pathlib import Path
 
 from click.testing import CliRunner
 from demisto_sdk.__main__ import main
@@ -24,19 +25,15 @@ from demisto_sdk.tests.test_files.validate_integration_test_valid_types import (
 from TestSuite.test_tools import ChangeCWD
 
 VALIDATE_CMD = "validate"
-TEST_FILES_PATH = join(git_path(), 'demisto_sdk', 'tests', 'test_files')
-AZURE_FEED_PACK_PATH = join(TEST_FILES_PATH, 'content_repo_example', 'Packs', 'FeedAzure')
-AZURE_FEED_INVALID_PACK_PATH = join(TEST_FILES_PATH, 'content_repo_example', 'Packs', 'FeedAzureab')
-VALID_PACK_PATH = join(TEST_FILES_PATH, 'content_repo_example', 'Packs', 'FeedAzureValid')
-VALID_PLAYBOOK_FILE_PATH = join(TEST_FILES_PATH, 'Packs', 'CortexXDR', 'Playbooks', 'Cortex_XDR_Incident_Handling.yml')
-INVALID_PLAYBOOK_FILE_PATH = join(TEST_FILES_PATH, 'Packs', 'CortexXDR', 'Playbooks',
-                                  'Cortex_XDR_Incident_Handling_invalid.yml')
-VALID_DEPRECATED_PLAYBOOK_FILE_PATH = join(TEST_FILES_PATH, 'Packs', 'CortexXDR', 'Playbooks',
-                                           'Valid_Deprecated_Playbook.yml')
-INVALID_DEPRECATED_PLAYBOOK_FILE_PATH = join(TEST_FILES_PATH, 'Packs', 'CortexXDR', 'Playbooks',
-                                             'Invalid_Deprecated_Playbook.yml')
-VALID_SCRIPT_PATH = join(TEST_FILES_PATH, 'Packs', 'CortexXDR', 'Scripts', 'EntryWidgetNumberHostsXDR',
-                         'EntryWidgetNumberHostsXDR.yml')
+TEST_FILES_PATH = Path(git_path()) / 'demisto_sdk' / 'tests' / 'test_files'
+AZURE_FEED_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzure'
+AZURE_FEED_INVALID_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzureab'
+VALID_PACK_PATH = Path(TEST_FILES_PATH) / 'content_repo_example' / 'Packs' / 'FeedAzureValid'
+VALID_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling.yml'
+INVALID_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Cortex_XDR_Incident_Handling_invalid.yml'
+VALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Valid_Deprecated_Playbook.yml'
+INVALID_DEPRECATED_PLAYBOOK_FILE_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Playbooks' / 'Invalid_Deprecated_Playbook.yml'
+VALID_SCRIPT_PATH = Path(TEST_FILES_PATH) / 'Packs' / 'CortexXDR' / 'Scripts' / 'EntryWidgetNumberHostsXDR' / 'EntryWidgetNumberHostsXDR.yml'
 
 CONF_JSON_MOCK = {
     "tests": [
@@ -1645,13 +1642,13 @@ class TestValidationUsingGit:
         mocker.patch.object(tools, 'is_external_repository', return_value=False)
         mocker.patch.object(PackUniqueFilesValidator, 'validate_pack_unique_files', return_value='')
         pack1 = repo.create_pack('PackName1')
-        pack_integration_path = join(AZURE_FEED_PACK_PATH, "Integrations/FeedAzure/FeedAzure.yml")
-        valid_integration_yml = get_yaml(pack_integration_path)
+        pack_integration_path = Path(AZURE_FEED_PACK_PATH) / "Integrations" / "FeedAzure" / "FeedAzure.yml"
+        valid_integration_yml = get_yaml(str(pack_integration_path))
         integration = pack1.create_integration(yml=valid_integration_yml)
         incident_field = pack1.create_incident_field('incident-field', content=INCIDENT_FIELD)
         dashboard = pack1.create_dashboard('dashboard', content=DASHBOARD)
 
-        valid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        valid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         pack2 = repo.create_pack('PackName2')
         script = pack2.create_script(yml=valid_script_yml)
 
@@ -1694,15 +1691,15 @@ class TestValidationUsingGit:
         mocker.patch.object(PackUniqueFilesValidator, 'validate_pack_unique_files', return_value='')
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         pack1 = repo.create_pack('PackName1')
-        pack_integration_path = join(AZURE_FEED_PACK_PATH, "Integrations/FeedAzure/FeedAzure.yml")
-        valid_integration_yml = get_yaml(pack_integration_path)
+        pack_integration_path = Path(AZURE_FEED_PACK_PATH) / "Integrations" / "FeedAzure" / "FeedAzure.yml"
+        valid_integration_yml = get_yaml(str(pack_integration_path))
         integration = pack1.create_integration(yml=valid_integration_yml)
         incident_field_copy = INCIDENT_FIELD.copy()
         incident_field_copy['content'] = False
         incident_field = pack1.create_incident_field('incident-field', content=incident_field_copy)
         dashboard = pack1.create_dashboard('dashboard', content=DASHBOARD)
 
-        invalid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        invalid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         invalid_script_yml['name'] = invalid_script_yml['name'] + "_v2"
         pack2 = repo.create_pack('PackName2')
         script = pack2.create_script(yml=invalid_script_yml)
@@ -1749,7 +1746,7 @@ class TestValidationUsingGit:
         """
         pack = repo.create_pack('FeedAzure')
         integration = pack.create_integration(name='FeedAzure',
-                                              yml=join(AZURE_FEED_PACK_PATH, "Integrations/FeedAzure/FeedAzure.yml"))
+                                              yml=str(Path(AZURE_FEED_PACK_PATH) / "Integrations" / "FeedAzure" / "FeedAzure.yml"))
         modified_files = {integration.yml.rel_path}
         mocker.patch.object(tools, 'is_external_repository', return_value=False)
         mocker.patch.object(BaseValidator, 'update_checked_flags_by_support_level', return_value=None)
