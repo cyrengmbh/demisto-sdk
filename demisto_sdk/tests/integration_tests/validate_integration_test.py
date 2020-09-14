@@ -1171,8 +1171,8 @@ class TestPlaybookValidation:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, '-i', VALID_PLAYBOOK_FILE_PATH], catch_exceptions=False)
-        assert f'Validating {VALID_PLAYBOOK_FILE_PATH} as playbook' in result.stdout
+        result = runner.invoke(main, [VALIDATE_CMD, '-i', str(VALID_PLAYBOOK_FILE_PATH)], catch_exceptions=False)
+        assert f'Validating {str(VALID_PLAYBOOK_FILE_PATH)} as playbook' in result.stdout
         assert 'The files are valid' in result.stdout
         assert result.exit_code == 0
 
@@ -1189,8 +1189,8 @@ class TestPlaybookValidation:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, '-i', INVALID_PLAYBOOK_FILE_PATH], catch_exceptions=False)
-        assert f'Validating {INVALID_PLAYBOOK_FILE_PATH} as playbook' in result.stdout
+        result = runner.invoke(main, [VALIDATE_CMD, '-i', str(INVALID_PLAYBOOK_FILE_PATH)], catch_exceptions=False)
+        assert f'Validating {str(INVALID_PLAYBOOK_FILE_PATH)} as playbook' in result.stdout
         assert 'PB103' in result.stdout
         assert 'The following tasks ids have no previous tasks: {\'5\'}' in result.stdout
         assert result.exit_code == 1
@@ -1210,8 +1210,8 @@ class TestPlaybookValidateDeprecated:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, '-i', VALID_DEPRECATED_PLAYBOOK_FILE_PATH], catch_exceptions=False)
-        assert f'Validating {VALID_DEPRECATED_PLAYBOOK_FILE_PATH} as playbook' in result.stdout
+        result = runner.invoke(main, [VALIDATE_CMD, '-i', str(VALID_DEPRECATED_PLAYBOOK_FILE_PATH)], catch_exceptions=False)
+        assert f'Validating {str(VALID_DEPRECATED_PLAYBOOK_FILE_PATH)} as playbook' in result.stdout
         assert 'The files are valid' in result.stdout
         assert result.exit_code == 0
 
@@ -1228,9 +1228,9 @@ class TestPlaybookValidateDeprecated:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         runner = CliRunner(mix_stderr=False)
-        result = runner.invoke(main, [VALIDATE_CMD, '-i', INVALID_DEPRECATED_PLAYBOOK_FILE_PATH],
+        result = runner.invoke(main, [VALIDATE_CMD, '-i', str(INVALID_DEPRECATED_PLAYBOOK_FILE_PATH)],
                                catch_exceptions=False)
-        assert f'Validating {INVALID_DEPRECATED_PLAYBOOK_FILE_PATH} as playbook' in result.stdout
+        assert f'Validating {str(INVALID_DEPRECATED_PLAYBOOK_FILE_PATH)} as playbook' in result.stdout
         assert 'PB104' in result.stdout
         assert 'The playbook description has to start with "Deprecated."' in result.stdout
         assert result.exit_code == 1
@@ -1343,7 +1343,7 @@ class TestScriptValidation:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         pack = repo.create_pack('PackName')
-        valid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        valid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         script = pack.create_script(yml=valid_script_yml)
         with ChangeCWD(pack.repo_path):
             runner = CliRunner(mix_stderr=False)
@@ -1367,7 +1367,7 @@ class TestScriptValidation:
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         pack = repo.create_pack('PackName')
-        invalid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        invalid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         invalid_script_yml['name'] = invalid_script_yml['name'] + "_v2"
         script = pack.create_script(yml=invalid_script_yml)
         with ChangeCWD(pack.repo_path):
@@ -1394,7 +1394,7 @@ class TestScriptDeprecatedValidation:
         """
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         pack = repo.create_pack('PackName')
-        valid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        valid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         valid_script_yml['deprecated'] = True
         valid_script_yml['comment'] = 'Deprecated.'
         script = pack.create_script(yml=valid_script_yml)
@@ -1420,7 +1420,7 @@ class TestScriptDeprecatedValidation:
         mocker.patch.object(tools, 'is_external_repository', return_value=True)
         mocker.patch.object(BaseValidator, 'check_file_flags', return_value='')
         pack = repo.create_pack('PackName')
-        invalid_script_yml = get_yaml(VALID_SCRIPT_PATH)
+        invalid_script_yml = get_yaml(str(VALID_SCRIPT_PATH))
         invalid_script_yml['deprecated'] = True
         script = pack.create_script(yml=invalid_script_yml)
         with ChangeCWD(pack.repo_path):
@@ -1581,8 +1581,8 @@ class TestAllFilesValidator:
                                    catch_exceptions=False)
 
         assert 'Validating all files' in result.stdout
-        assert 'Validating Packs/PackName1 unique pack files' in result.stdout
-        assert 'Validating Packs/PackName2 unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName1")} unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName2")} unique pack files' in result.stdout
         assert f'Validating {integration.yml_path} as integration' in result.stdout
         assert f'Validating {incident_field.get_path_from_pack()} as incidentfield' in result.stdout
         assert f'Validating {dashboard.get_path_from_pack()} as dashboard' in result.stdout
@@ -1625,8 +1625,8 @@ class TestAllFilesValidator:
                                    catch_exceptions=False)
 
         assert 'Validating all files' in result.stdout
-        assert 'Validating Packs/PackName1 unique pack files' in result.stdout
-        assert 'Validating Packs/PackName2 unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName1")} unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName2")} unique pack files' in result.stdout
         assert f'Validating {integration.yml_path} as integration' in result.stdout
         assert f'Validating {incident_field.get_path_from_pack()} as incidentfield' in result.stdout
         assert f'Validating {dashboard.get_path_from_pack()} as dashboard' in result.stdout
@@ -1678,8 +1678,8 @@ class TestValidationUsingGit:
         assert 'Running validation on modified files' in result.stdout
         assert 'Running validation on newly added files' in result.stdout
         assert 'Running validation on changed pack unique files' in result.stdout
-        assert 'Validating Packs/PackName1 unique pack files' in result.stdout
-        assert 'Validating Packs/PackName2 unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName1")} unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName2")} unique pack files' in result.stdout
         assert f'Validating {integration.yml_path} as integration' in result.stdout
         assert f'Validating {incident_field.get_path_from_pack()} as incidentfield' in result.stdout
         assert f'Validating {dashboard.get_path_from_pack()} as dashboard' in result.stdout
@@ -1731,8 +1731,8 @@ class TestValidationUsingGit:
         assert 'Running validation on modified files' in result.stdout
         assert 'Running validation on newly added files' in result.stdout
         assert 'Running validation on changed pack unique files' in result.stdout
-        assert 'Validating Packs/PackName1 unique pack files' in result.stdout
-        assert 'Validating Packs/PackName2 unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName1")} unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "PackName2")} unique pack files' in result.stdout
         assert f'Validating {integration.yml_path} as integration' in result.stdout
         assert f'Validating {incident_field.get_path_from_pack()} as incidentfield' in result.stdout
         assert f'Validating {dashboard.get_path_from_pack()} as dashboard' in result.stdout
@@ -1776,7 +1776,7 @@ class TestValidationUsingGit:
         assert 'Running validation on modified files' in result.stdout
         assert 'Running validation on newly added files' in result.stdout
         assert 'Running validation on changed pack unique files' in result.stdout
-        assert 'Validating Packs/FeedAzure unique pack files' in result.stdout
+        assert f'Validating {str(Path("Packs") / "FeedAzure")} unique pack files' in result.stdout
         assert 'Running pack dependencies validation on' not in result.stdout
         assert result.exit_code == 1
 
