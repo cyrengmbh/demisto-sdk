@@ -404,11 +404,15 @@ def secrets(config, **kwargs):
 @click.option("--test-xml", help="Path to store pytest xml results", type=click.Path(exists=True, resolve_path=True))
 @click.option("--failure-report", help="Path to store failed packs report",
               type=click.Path(exists=True, resolve_path=True))
+@click.option("--warning-report", help="Path to store warnings report",
+              type=click.Path(exists=True, resolve_path=True))
 @click.option("-lp", "--log-path", help="Path to store all levels of logs",
               type=click.Path(exists=True, resolve_path=True))
 def lint(input: str, git: bool, all_packs: bool, verbose: int, quiet: bool, parallel: int, no_flake8: bool,
-         no_bandit: bool, no_mypy: bool, no_vulture: bool, no_xsoar_linter: bool, no_pylint: bool, no_test: bool, no_pwsh_analyze: bool,
-         no_pwsh_test: bool, keep_container: bool, prev_ver: str, test_xml: str, failure_report: str, log_path: str):
+         no_bandit: bool, no_mypy: bool, no_vulture: bool, no_xsoar_linter: bool, no_pylint: bool, no_test: bool,
+         no_pwsh_analyze: bool,
+         no_pwsh_test: bool, keep_container: bool, prev_ver: str, test_xml: str, failure_report: str,
+         warning_report: str, log_path: str):
     """Lint command will perform:\n
         1. Package in host checks - flake8, bandit, mypy, vulture.\n
         2. Package in docker image checks -  pylint, pytest, powershell - test, powershell - analyze.\n
@@ -433,7 +437,8 @@ def lint(input: str, git: bool, all_packs: bool, verbose: int, quiet: bool, para
                                          no_pwsh_test=no_pwsh_test,
                                          keep_container=keep_container,
                                          test_xml=test_xml,
-                                         failure_report=failure_report)
+                                         failure_report=failure_report,
+                                         warning_report=warning_report)
 
 
 # ====================== format ====================== #

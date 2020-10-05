@@ -229,7 +229,7 @@ class LintManager:
     def run_dev_packages(self, parallel: int, no_flake8: bool, no_xsoar_linter: bool, no_bandit: bool, no_mypy: bool, no_pylint: bool,
                          no_vulture: bool, no_test: bool, no_pwsh_analyze: bool, no_pwsh_test: bool,
                          keep_container: bool,
-                         test_xml: str, failure_report: str) -> int:
+                         test_xml: str, failure_report: str, warning_report: str) -> int:
         """ Runs the Lint command on all given packages.
 
         Args:
@@ -246,6 +246,7 @@ class LintManager:
             keep_container(bool): Whether to keep the test container
             test_xml(str): Path for saving pytest xml results
             failure_report(str): Path for store failed packs report
+            warning_report(str): Path for store warnings report
 
         Returns:
             int: exit code by fail exit codes by var EXIT_CODES
@@ -350,6 +351,9 @@ class LintManager:
                              skipped_code=int(skipped_code),
                              pkgs_type=pkgs_type)
         self._create_failed_packs_report(lint_status=lint_status, path=failure_report)
+        self._create_warnings_packs_report(lint_status=lint_status,
+                                           pkgs_status=pkgs_status, path=warning_report,
+                                           return_warning_code=return_warning_code)
 
         # check if there were any errors during lint run , if so set to FAIL as some error codes are bigger
         # then 512 and will not cause failure on the exit code.
@@ -672,3 +676,21 @@ class LintManager:
         if path and failed_ut:
             file_path = Path(path) / "failed_lint_report.txt"
             file_path.write_text('\n'.join(failed_ut))
+
+    @staticmethod
+    def _create_warnings_packs_report(lint_status: dict, pkgs_status: dict, path: str, return_warning_code: int):
+        """
+        Creates and saves a file containing all lint warnings msgs
+        :param lint_status: dict
+            Dictionary containing type of failures and corresponding failing tests. Looks like this:
+        :param path: str
+            The path to save the report.
+        """
+        warnings: set = set()
+        for check in ["flake8", "XSOAR_linter", "bandit", "mypy", "vulture"]:
+            if EXIT_CODES[check] & return_warning_code:
+                for pack in lint_status[f"warning_packs_{check}"]:
+                    warnings = warnings.union((pkgs_status[pack][f"{check}_warnings"]).split('\n'))
+        if path and warnings:
+            file_path = Path(path) / "warnings_lint_report.txt"
+            file_path.write_text('\n'.join(warnings))
