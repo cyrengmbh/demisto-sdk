@@ -8,3 +8,4 @@ pytest-datadir-ng
 pytest-mock
 requests_mock
 tox-pyenv
+pytest-xdist
