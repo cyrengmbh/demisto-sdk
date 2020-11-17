@@ -780,6 +780,7 @@ def generate_doc(**kwargs):
 def id_set_command(**kwargs):
     id_set_creator = IDSetCreator(**kwargs)
     id_set_creator.create_id_set()
+    sys.exit(0)
 
 
 # ====================== update-release-notes =================== #
