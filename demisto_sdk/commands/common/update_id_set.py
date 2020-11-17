@@ -1107,7 +1107,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     widgets_list = []
     mappers_list = []
     print("\n\n\nstarting pool\n\n\n")
-    pool = Pool(processes=int(cpu_count() * 1.5))
+    pool = Pool(processes=int(cpu_count() * 1))
 
     print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
     print("\n\n\nstartiing with\n\n\n")
