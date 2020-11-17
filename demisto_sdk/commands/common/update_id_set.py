@@ -10,7 +10,8 @@ from distutils.version import LooseVersion
 from functools import partial
 from multiprocessing import Pool, cpu_count
 from typing import Callable, Optional, Tuple
-
+import os
+import psutil
 import click
 import networkx
 from demisto_sdk.commands.common.constants import (CLASSIFIERS_DIR,
@@ -1039,6 +1040,9 @@ def get_general_paths(path):
 
 DEFAULT_ID_SET_PATH = "./Tests/id_set.json"
 
+def get_memory():
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss
 
 def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_to_create: list = None,  # noqa: C901
                      print_logs: bool = True):
@@ -1051,7 +1055,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
 
     Returns: id set object
     """
-    print("\n\n\nstartiing re_create_id_set\n\n\n")
+    print(f"\n\n\nstartiing re_create_id_set, memory used: {get_memory()}\n\n\n")
     if id_set_path == "":
         id_set_path = DEFAULT_ID_SET_PATH
     if id_set_path and os.path.exists(id_set_path):
@@ -1106,11 +1110,11 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     reports_list = []
     widgets_list = []
     mappers_list = []
-    print("\n\n\nstarting pool\n\n\n")
+    print(f"\n\n\nstarting pool, memory used: {get_memory()}\n\n\n")
     pool = Pool(processes=int(cpu_count() * 1))
 
     print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
-    print("\n\n\nstartiing with\n\n\n")
+    print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
     with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
         if 'Integrations' in objects_to_create:
             print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
@@ -1313,7 +1317,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
         print(
             f'The following ids were found duplicates\n{json.dumps(duplicates, indent=4)}\n'
         )
-    print("\n\n\n returning \n\n\n")
+    print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
     # return new_ids_dict
 
 
