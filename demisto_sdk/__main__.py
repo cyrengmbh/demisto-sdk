@@ -782,7 +782,8 @@ def id_set_command(**kwargs):
     print("\n\n\nbefore create_id_set\n\n\n")
     id_set_creator.create_id_set()
     print("\n\n\nafter create_id_set\n\n\n")
-    sys.exit(0)
+    return 0
+    # sys.exit(0)
 
 
 # ====================== update-release-notes =================== #
