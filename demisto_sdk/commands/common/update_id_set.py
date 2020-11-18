@@ -1322,7 +1322,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     # sys.exit(0)
     # print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
     # return new_ids_dict
-    return None
+    return OrderedDict()
 
 
 def find_duplicates(id_set, print_logs):
