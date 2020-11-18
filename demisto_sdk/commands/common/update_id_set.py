@@ -1349,7 +1349,7 @@ def find_duplicates(id_set, print_logs):
             field_list.append(field_to_check)
     lists_to_return.append(field_list)
     print(f'\n\n\nFinished running find_duplicates. time is: {datetime.now().time()}\n\n\n')
-    return lists_to_return
+    # return lists_to_return
 
 
 def has_duplicate(id_set, id_to_check, object_type=None, print_logs=True):
