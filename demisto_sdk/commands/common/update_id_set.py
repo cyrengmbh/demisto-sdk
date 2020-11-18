@@ -1313,16 +1313,15 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     exec_time = time.time() - start_time
     print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
     print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
-    duplicates = find_duplicates(new_ids_dict, print_logs)
-    if any(duplicates) and print_logs:
-        print(
-            f'The following ids were found duplicates - V2 TEST\n\n'
-        )
-
-    raise Exception('TEST FAIL')
-    sys.exit(0)
-    # print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
-    # return new_ids_dict
+    # duplicates = find_duplicates(new_ids_dict, print_logs)
+    # if any(duplicates) and print_logs:
+    #     print(
+    #         f'The following ids were found duplicates - V2 TEST\n\n'
+    #     )
+    #
+    # sys.exit(0)
+    print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
+    return new_ids_dict
 
 
 def find_duplicates(id_set, print_logs):
