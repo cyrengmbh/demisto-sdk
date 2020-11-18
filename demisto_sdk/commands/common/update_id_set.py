@@ -1056,263 +1056,263 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
 
     Returns: id set object
     """
-    print(f"\n\n\nstartiing re_create_id_set, memory used: {get_memory()}\n\n\n")
-    if id_set_path == "":
-        id_set_path = DEFAULT_ID_SET_PATH
-    if id_set_path and os.path.exists(id_set_path):
-        try:
-            refresh_interval = int(os.getenv('DEMISTO_SDK_ID_SET_REFRESH_INTERVAL', -1))
-        except ValueError:
-            refresh_interval = -1
-            print_color(
-                "Re-creating id_set.\n"
-                "DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set with value: "
-                f"{os.getenv('DEMISTO_SDK_ID_SET_REFRESH_INTERVAL')} which is an illegal integer."
-                "\nPlease modify or unset env var.", LOG_COLORS.YELLOW
-            )
-        if refresh_interval > 0:  # if file is newer than refersh interval use it as is
-            mtime = os.path.getmtime(id_set_path)
-            mtime_dt = datetime.fromtimestamp(mtime)
-            target_time = time.time() - (refresh_interval * 60)
-            if mtime >= target_time:
-                print_color(f"DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set and detected that current id_set: {id_set_path}"
-                            f" modify time: {mtime_dt} "
-                            "doesn't require a refresh. Will use current id set. "
-                            "If you want to force an id set referesh unset DEMISTO_SDK_ID_SET_REFRESH_INTERVAL or set to -1.", LOG_COLORS.GREEN)
-                with open(id_set_path, mode="r") as f:
-                    return json.load(f)
-            else:
-                print_color(f"DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set but current id_set: {id_set_path} "
-                            f"modify time: {mtime_dt} is older than refresh interval. "
-                            "Will re-generate the id set.", LOG_COLORS.GREEN)
-        else:
-            print_color("Note: DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is not enabled. "
-                        f"Will re-generate the id set even though file exists: {id_set_path}. "
-                        "If you would like to avoid re-generating the id set every run, you can set the env var "
-                        "DEMISTO_SDK_ID_SET_REFRESH_INTERVAL to a refresh interval in minutes.", LOG_COLORS.GREEN)
-        print("")  # add an empty line for clarity
-
-    if objects_to_create is None:
-        objects_to_create = CONTENT_ENTITIES
-
-    start_time = time.time()
-    scripts_list = []
-    playbooks_list = []
-    integration_list = []
-    testplaybooks_list = []
-
-    classifiers_list = []
-    dashboards_list = []
-    incident_fields_list = []
-    incident_type_list = []
-    indicator_fields_list = []
-    indicator_types_list = []
-    layouts_list = []
-    reports_list = []
-    widgets_list = []
-    mappers_list = []
-    print(f"\n\n\nstarting pool, memory used: {get_memory()}\n\n\n")
-    pool = Pool(processes=int(cpu_count() * 1))
-
-    print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
-    print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
-    with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
-        if 'Integrations' in objects_to_create:
-            print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_integration,
-                                        print_logs=print_logs
-                                        ),
-                                get_integrations_paths()):
-                integration_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Playbooks' in objects_to_create:
-            print_color("\nStarting iteration over Playbooks", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.PLAYBOOK,),
-                                        data_extraction_func=get_playbook_data,
-                                        ),
-                                get_playbooks_paths()):
-                playbooks_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Scripts' in objects_to_create:
-            print_color("\nStarting iteration over Scripts", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_script,
-                                        print_logs=print_logs
-                                        ),
-                                get_general_paths(SCRIPTS_DIR)):
-                scripts_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'TestPlaybooks' in objects_to_create:
-            print_color("\nStarting iteration over TestPlaybooks", LOG_COLORS.GREEN)
-            for pair in pool.map(partial(process_test_playbook_path,
-                                         print_logs=print_logs
-                                         ),
-                                 get_general_paths(TEST_PLAYBOOKS_DIR)):
-                if pair[0]:
-                    testplaybooks_list.append(pair[0])
-                if pair[1]:
-                    scripts_list.append(pair[1])
-
-        progress_bar.update(1)
-
-        if 'Classifiers' in objects_to_create:
-            print_color("\nStarting iteration over Classifiers", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.CLASSIFIER, FileType.OLD_CLASSIFIER),
-                                        data_extraction_func=get_classifier_data,
-                                        ),
-                                get_general_paths(CLASSIFIERS_DIR)):
-                classifiers_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Dashboards' in objects_to_create:
-            print_color("\nStarting iteration over Dashboards", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.DASHBOARD,),
-                                        data_extraction_func=get_general_data,
-                                        ),
-                                get_general_paths(DASHBOARDS_DIR)):
-                dashboards_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'IncidentTypes' in objects_to_create:
-            print_color("\nStarting iteration over Incident Types", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.INCIDENT_TYPE,),
-                                        data_extraction_func=get_incident_type_data,
-                                        ),
-                                get_general_paths(INCIDENT_TYPES_DIR)):
-                incident_type_list.extend(arr)
-
-        progress_bar.update(1)
-
-        # Has to be called after 'IncidentTypes' is called
-        if 'IncidentFields' in objects_to_create:
-            print_color("\nStarting iteration over Incident Fields", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_incident_fields,
-                                        print_logs=print_logs,
-                                        incidents_types_list=incident_type_list
-                                        ),
-                                get_general_paths(INCIDENT_FIELDS_DIR)):
-                incident_fields_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'IndicatorFields' in objects_to_create:
-            print_color("\nStarting iteration over Indicator Fields", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.INDICATOR_FIELD,),
-                                        data_extraction_func=get_general_data,
-                                        ),
-                                get_general_paths(INDICATOR_FIELDS_DIR)):
-                indicator_fields_list.extend(arr)
-
-        progress_bar.update(1)
-
-        # Has to be called after 'Integrations' is called
-        if 'IndicatorTypes' in objects_to_create:
-            print_color("\nStarting iteration over Indicator Types", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_indicator_types,
-                                        print_logs=print_logs,
-                                        all_integrations=integration_list
-                                        ),
-                                get_general_paths(INDICATOR_TYPES_DIR)):
-                indicator_types_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Layouts' in objects_to_create:
-            print_color("\nStarting iteration over Layouts", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.LAYOUT,),
-                                        data_extraction_func=get_layout_data,
-                                        ),
-                                get_general_paths(LAYOUTS_DIR)):
-                layouts_list.extend(arr)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.LAYOUTS_CONTAINER,),
-                                        data_extraction_func=get_layoutscontainer_data,
-                                        ),
-                                get_general_paths(LAYOUTS_DIR)):
-                layouts_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Reports' in objects_to_create:
-            print_color("\nStarting iteration over Reports", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.REPORT,),
-                                        data_extraction_func=get_general_data,
-                                        ),
-                                get_general_paths(REPORTS_DIR)):
-                reports_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Widgets' in objects_to_create:
-            print_color("\nStarting iteration over Widgets", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.WIDGET,),
-                                        data_extraction_func=get_widget_data,
-                                        ),
-                                get_general_paths(WIDGETS_DIR)):
-                widgets_list.extend(arr)
-
-        progress_bar.update(1)
-
-        if 'Mappers' in objects_to_create:
-            print_color("\nStarting iteration over Mappers", LOG_COLORS.GREEN)
-            for arr in pool.map(partial(process_general_items,
-                                        print_logs=print_logs,
-                                        expected_file_types=(FileType.MAPPER,),
-                                        data_extraction_func=get_mapper_data,
-                                        ),
-                                get_general_paths(MAPPERS_DIR)):
-                mappers_list.extend(arr)
-
-        progress_bar.update(1)
-
-    new_ids_dict = OrderedDict()
-    # we sort each time the whole set in case someone manually changed something
-    # it shouldn't take too much time
-    new_ids_dict['scripts'] = sort(scripts_list)
-    new_ids_dict['playbooks'] = sort(playbooks_list)
-    new_ids_dict['integrations'] = sort(integration_list)
-    new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
-    new_ids_dict['Classifiers'] = sort(classifiers_list)
-    new_ids_dict['Dashboards'] = sort(dashboards_list)
-    new_ids_dict['IncidentFields'] = sort(incident_fields_list)
-    new_ids_dict['IncidentTypes'] = sort(incident_type_list)
-    new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
-    new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
-    new_ids_dict['Layouts'] = sort(layouts_list)
-    new_ids_dict['Reports'] = sort(reports_list)
-    new_ids_dict['Widgets'] = sort(widgets_list)
-    new_ids_dict['Mappers'] = sort(mappers_list)
-    print(f'\n\n\ntime after initializing new_ids_dict: {datetime.now().time()}\n\n\n')
-    if id_set_path:
-        with open(id_set_path, 'w+') as id_set_file:
-            json.dump(new_ids_dict, id_set_file, indent=4)
-    exec_time = time.time() - start_time
-    print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
-    print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
+    # print(f"\n\n\nstartiing re_create_id_set, memory used: {get_memory()}\n\n\n")
+    # if id_set_path == "":
+    #     id_set_path = DEFAULT_ID_SET_PATH
+    # if id_set_path and os.path.exists(id_set_path):
+    #     try:
+    #         refresh_interval = int(os.getenv('DEMISTO_SDK_ID_SET_REFRESH_INTERVAL', -1))
+    #     except ValueError:
+    #         refresh_interval = -1
+    #         print_color(
+    #             "Re-creating id_set.\n"
+    #             "DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set with value: "
+    #             f"{os.getenv('DEMISTO_SDK_ID_SET_REFRESH_INTERVAL')} which is an illegal integer."
+    #             "\nPlease modify or unset env var.", LOG_COLORS.YELLOW
+    #         )
+    #     if refresh_interval > 0:  # if file is newer than refersh interval use it as is
+    #         mtime = os.path.getmtime(id_set_path)
+    #         mtime_dt = datetime.fromtimestamp(mtime)
+    #         target_time = time.time() - (refresh_interval * 60)
+    #         if mtime >= target_time:
+    #             print_color(f"DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set and detected that current id_set: {id_set_path}"
+    #                         f" modify time: {mtime_dt} "
+    #                         "doesn't require a refresh. Will use current id set. "
+    #                         "If you want to force an id set referesh unset DEMISTO_SDK_ID_SET_REFRESH_INTERVAL or set to -1.", LOG_COLORS.GREEN)
+    #             with open(id_set_path, mode="r") as f:
+    #                 return json.load(f)
+    #         else:
+    #             print_color(f"DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is set but current id_set: {id_set_path} "
+    #                         f"modify time: {mtime_dt} is older than refresh interval. "
+    #                         "Will re-generate the id set.", LOG_COLORS.GREEN)
+    #     else:
+    #         print_color("Note: DEMISTO_SDK_ID_SET_REFRESH_INTERVAL env var is not enabled. "
+    #                     f"Will re-generate the id set even though file exists: {id_set_path}. "
+    #                     "If you would like to avoid re-generating the id set every run, you can set the env var "
+    #                     "DEMISTO_SDK_ID_SET_REFRESH_INTERVAL to a refresh interval in minutes.", LOG_COLORS.GREEN)
+    #     print("")  # add an empty line for clarity
+    #
+    # if objects_to_create is None:
+    #     objects_to_create = CONTENT_ENTITIES
+    #
+    # start_time = time.time()
+    # scripts_list = []
+    # playbooks_list = []
+    # integration_list = []
+    # testplaybooks_list = []
+    #
+    # classifiers_list = []
+    # dashboards_list = []
+    # incident_fields_list = []
+    # incident_type_list = []
+    # indicator_fields_list = []
+    # indicator_types_list = []
+    # layouts_list = []
+    # reports_list = []
+    # widgets_list = []
+    # mappers_list = []
+    # print(f"\n\n\nstarting pool, memory used: {get_memory()}\n\n\n")
+    # pool = Pool(processes=int(cpu_count() * 1))
+    #
+    # print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
+    # print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
+    # with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
+    #     if 'Integrations' in objects_to_create:
+    #         print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_integration,
+    #                                     print_logs=print_logs
+    #                                     ),
+    #                             get_integrations_paths()):
+    #             integration_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Playbooks' in objects_to_create:
+    #         print_color("\nStarting iteration over Playbooks", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.PLAYBOOK,),
+    #                                     data_extraction_func=get_playbook_data,
+    #                                     ),
+    #                             get_playbooks_paths()):
+    #             playbooks_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Scripts' in objects_to_create:
+    #         print_color("\nStarting iteration over Scripts", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_script,
+    #                                     print_logs=print_logs
+    #                                     ),
+    #                             get_general_paths(SCRIPTS_DIR)):
+    #             scripts_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'TestPlaybooks' in objects_to_create:
+    #         print_color("\nStarting iteration over TestPlaybooks", LOG_COLORS.GREEN)
+    #         for pair in pool.map(partial(process_test_playbook_path,
+    #                                      print_logs=print_logs
+    #                                      ),
+    #                              get_general_paths(TEST_PLAYBOOKS_DIR)):
+    #             if pair[0]:
+    #                 testplaybooks_list.append(pair[0])
+    #             if pair[1]:
+    #                 scripts_list.append(pair[1])
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Classifiers' in objects_to_create:
+    #         print_color("\nStarting iteration over Classifiers", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.CLASSIFIER, FileType.OLD_CLASSIFIER),
+    #                                     data_extraction_func=get_classifier_data,
+    #                                     ),
+    #                             get_general_paths(CLASSIFIERS_DIR)):
+    #             classifiers_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Dashboards' in objects_to_create:
+    #         print_color("\nStarting iteration over Dashboards", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.DASHBOARD,),
+    #                                     data_extraction_func=get_general_data,
+    #                                     ),
+    #                             get_general_paths(DASHBOARDS_DIR)):
+    #             dashboards_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'IncidentTypes' in objects_to_create:
+    #         print_color("\nStarting iteration over Incident Types", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.INCIDENT_TYPE,),
+    #                                     data_extraction_func=get_incident_type_data,
+    #                                     ),
+    #                             get_general_paths(INCIDENT_TYPES_DIR)):
+    #             incident_type_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     # Has to be called after 'IncidentTypes' is called
+    #     if 'IncidentFields' in objects_to_create:
+    #         print_color("\nStarting iteration over Incident Fields", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_incident_fields,
+    #                                     print_logs=print_logs,
+    #                                     incidents_types_list=incident_type_list
+    #                                     ),
+    #                             get_general_paths(INCIDENT_FIELDS_DIR)):
+    #             incident_fields_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'IndicatorFields' in objects_to_create:
+    #         print_color("\nStarting iteration over Indicator Fields", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.INDICATOR_FIELD,),
+    #                                     data_extraction_func=get_general_data,
+    #                                     ),
+    #                             get_general_paths(INDICATOR_FIELDS_DIR)):
+    #             indicator_fields_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     # Has to be called after 'Integrations' is called
+    #     if 'IndicatorTypes' in objects_to_create:
+    #         print_color("\nStarting iteration over Indicator Types", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_indicator_types,
+    #                                     print_logs=print_logs,
+    #                                     all_integrations=integration_list
+    #                                     ),
+    #                             get_general_paths(INDICATOR_TYPES_DIR)):
+    #             indicator_types_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Layouts' in objects_to_create:
+    #         print_color("\nStarting iteration over Layouts", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.LAYOUT,),
+    #                                     data_extraction_func=get_layout_data,
+    #                                     ),
+    #                             get_general_paths(LAYOUTS_DIR)):
+    #             layouts_list.extend(arr)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.LAYOUTS_CONTAINER,),
+    #                                     data_extraction_func=get_layoutscontainer_data,
+    #                                     ),
+    #                             get_general_paths(LAYOUTS_DIR)):
+    #             layouts_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Reports' in objects_to_create:
+    #         print_color("\nStarting iteration over Reports", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.REPORT,),
+    #                                     data_extraction_func=get_general_data,
+    #                                     ),
+    #                             get_general_paths(REPORTS_DIR)):
+    #             reports_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Widgets' in objects_to_create:
+    #         print_color("\nStarting iteration over Widgets", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.WIDGET,),
+    #                                     data_extraction_func=get_widget_data,
+    #                                     ),
+    #                             get_general_paths(WIDGETS_DIR)):
+    #             widgets_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    #     if 'Mappers' in objects_to_create:
+    #         print_color("\nStarting iteration over Mappers", LOG_COLORS.GREEN)
+    #         for arr in pool.map(partial(process_general_items,
+    #                                     print_logs=print_logs,
+    #                                     expected_file_types=(FileType.MAPPER,),
+    #                                     data_extraction_func=get_mapper_data,
+    #                                     ),
+    #                             get_general_paths(MAPPERS_DIR)):
+    #             mappers_list.extend(arr)
+    #
+    #     progress_bar.update(1)
+    #
+    # new_ids_dict = OrderedDict()
+    # # we sort each time the whole set in case someone manually changed something
+    # # it shouldn't take too much time
+    # new_ids_dict['scripts'] = sort(scripts_list)
+    # new_ids_dict['playbooks'] = sort(playbooks_list)
+    # new_ids_dict['integrations'] = sort(integration_list)
+    # new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
+    # new_ids_dict['Classifiers'] = sort(classifiers_list)
+    # new_ids_dict['Dashboards'] = sort(dashboards_list)
+    # new_ids_dict['IncidentFields'] = sort(incident_fields_list)
+    # new_ids_dict['IncidentTypes'] = sort(incident_type_list)
+    # new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
+    # new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
+    # new_ids_dict['Layouts'] = sort(layouts_list)
+    # new_ids_dict['Reports'] = sort(reports_list)
+    # new_ids_dict['Widgets'] = sort(widgets_list)
+    # new_ids_dict['Mappers'] = sort(mappers_list)
+    # print(f'\n\n\ntime after initializing new_ids_dict: {datetime.now().time()}\n\n\n')
+    # if id_set_path:
+    #     with open(id_set_path, 'w+') as id_set_file:
+    #         json.dump(new_ids_dict, id_set_file, indent=4)
+    # exec_time = time.time() - start_time
+    # print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
+    # print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
     # duplicates = find_duplicates(new_ids_dict, print_logs)
     # if any(duplicates) and print_logs:
     #     print(
@@ -1320,8 +1320,9 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     #     )
     #
     # sys.exit(0)
-    print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
-    return new_ids_dict
+    # print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
+    # return new_ids_dict
+    return None
 
 
 def find_duplicates(id_set, print_logs):
