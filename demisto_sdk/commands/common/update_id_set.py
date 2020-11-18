@@ -3,6 +3,7 @@ import itertools
 import json
 import os
 import re
+import sys
 import time
 from collections import OrderedDict
 from datetime import datetime
@@ -1318,6 +1319,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
             f'The following ids were found duplicates - V2 TEST\n\n'
         )
 
+    raise Exception('TEST FAIL')
     sys.exit(0)
     # print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
     # return new_ids_dict
