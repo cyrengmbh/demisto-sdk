@@ -1315,7 +1315,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     duplicates = find_duplicates(new_ids_dict, print_logs)
     if any(duplicates) and print_logs:
         print(
-            f'The following ids were found duplicates\n{json.dumps(duplicates, indent=4)}\n'
+            f'The following ids were found duplicates - V2 TEST\n\n'
         )
     print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
     return new_ids_dict
