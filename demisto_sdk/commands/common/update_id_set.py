@@ -1091,31 +1091,31 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                         "If you would like to avoid re-generating the id set every run, you can set the env var "
                         "DEMISTO_SDK_ID_SET_REFRESH_INTERVAL to a refresh interval in minutes.", LOG_COLORS.GREEN)
         print("")  # add an empty line for clarity
-    #
-    # if objects_to_create is None:
-    #     objects_to_create = CONTENT_ENTITIES
-    #
-    # start_time = time.time()
-    # scripts_list = []
-    # playbooks_list = []
-    # integration_list = []
-    # testplaybooks_list = []
-    #
-    # classifiers_list = []
-    # dashboards_list = []
-    # incident_fields_list = []
-    # incident_type_list = []
-    # indicator_fields_list = []
-    # indicator_types_list = []
-    # layouts_list = []
-    # reports_list = []
-    # widgets_list = []
-    # mappers_list = []
-    # print(f"\n\n\nstarting pool, memory used: {get_memory()}\n\n\n")
-    # pool = Pool(processes=int(cpu_count() * 1))
-    #
-    # print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
-    # print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
+
+    if objects_to_create is None:
+        objects_to_create = CONTENT_ENTITIES
+
+    start_time = time.time()
+    scripts_list = []
+    playbooks_list = []
+    integration_list = []
+    testplaybooks_list = []
+
+    classifiers_list = []
+    dashboards_list = []
+    incident_fields_list = []
+    incident_type_list = []
+    indicator_fields_list = []
+    indicator_types_list = []
+    layouts_list = []
+    reports_list = []
+    widgets_list = []
+    mappers_list = []
+    print(f"\n\n\nstarting pool, memory used: {get_memory()}\n\n\n")
+    pool = Pool(processes=int(cpu_count() * 1))
+
+    print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
+    print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
     # with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
     #     if 'Integrations' in objects_to_create:
     #         print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
