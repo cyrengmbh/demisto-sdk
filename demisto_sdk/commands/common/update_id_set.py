@@ -1095,7 +1095,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     if objects_to_create is None:
         objects_to_create = CONTENT_ENTITIES
 
-    start_time = time.time()
+    start_time = datetime.now().timestamp()
     scripts_list = []
     playbooks_list = []
     integration_list = []
@@ -1312,7 +1312,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     if id_set_path:
         with open(id_set_path, 'w+') as id_set_file:
             json.dump(new_ids_dict, id_set_file, indent=4)
-    # exec_time = time.time() - start_time
+    exec_time = datetime.now().timestamp() - start_time
     # print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
     # print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
     # duplicates = find_duplicates(new_ids_dict, print_logs)
