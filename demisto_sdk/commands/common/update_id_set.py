@@ -1294,35 +1294,35 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     new_ids_dict = OrderedDict()
     # we sort each time the whole set in case someone manually changed something
     # it shouldn't take too much time
-    new_ids_dict['scripts'] = sort(scripts_list)
-    new_ids_dict['playbooks'] = sort(playbooks_list)
-    new_ids_dict['integrations'] = sort(integration_list)
-    new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
-    new_ids_dict['Classifiers'] = sort(classifiers_list)
-    new_ids_dict['Dashboards'] = sort(dashboards_list)
-    new_ids_dict['IncidentFields'] = sort(incident_fields_list)
-    new_ids_dict['IncidentTypes'] = sort(incident_type_list)
-    new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
-    new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
-    new_ids_dict['Layouts'] = sort(layouts_list)
-    new_ids_dict['Reports'] = sort(reports_list)
-    new_ids_dict['Widgets'] = sort(widgets_list)
-    new_ids_dict['Mappers'] = sort(mappers_list)
-    print(f'\n\n\ntime after initializing new_ids_dict: {datetime.now().time()}\n\n\n')
-    if id_set_path:
-        with open(id_set_path, 'w+') as id_set_file:
-            json.dump(new_ids_dict, id_set_file, indent=4)
-    exec_time = time.time() - start_time
-    print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
-    print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
-    duplicates = find_duplicates(new_ids_dict, print_logs)
-    if any(duplicates) and print_logs:
-        print(
-            f'The following ids were found duplicates - V2 TEST\n\n'
-        )
-
-    sys.exit(0)
-    print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
+    # new_ids_dict['scripts'] = sort(scripts_list)
+    # new_ids_dict['playbooks'] = sort(playbooks_list)
+    # new_ids_dict['integrations'] = sort(integration_list)
+    # new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
+    # new_ids_dict['Classifiers'] = sort(classifiers_list)
+    # new_ids_dict['Dashboards'] = sort(dashboards_list)
+    # new_ids_dict['IncidentFields'] = sort(incident_fields_list)
+    # new_ids_dict['IncidentTypes'] = sort(incident_type_list)
+    # new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
+    # new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
+    # new_ids_dict['Layouts'] = sort(layouts_list)
+    # new_ids_dict['Reports'] = sort(reports_list)
+    # new_ids_dict['Widgets'] = sort(widgets_list)
+    # new_ids_dict['Mappers'] = sort(mappers_list)
+    # print(f'\n\n\ntime after initializing new_ids_dict: {datetime.now().time()}\n\n\n')
+    # if id_set_path:
+    #     with open(id_set_path, 'w+') as id_set_file:
+    #         json.dump(new_ids_dict, id_set_file, indent=4)
+    # exec_time = time.time() - start_time
+    # print_color("Finished the creation of the id_set. Total time: {} seconds".format(exec_time), LOG_COLORS.GREEN)
+    # print(f'\n\n\ntime before finding duplicates: {datetime.now().time()}\n\n\n')
+    # duplicates = find_duplicates(new_ids_dict, print_logs)
+    # if any(duplicates) and print_logs:
+    #     print(
+    #         f'The following ids were found duplicates - V2 TEST\n\n'
+    #     )
+    #
+    # sys.exit(0)
+    # print(f"\n\n\n returning , memory used: {get_memory()} \n\n\n")
     # return new_ids_dict
     return OrderedDict()
 
