@@ -1291,23 +1291,23 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     # progress_bar.update(1)
 
     #
-    # new_ids_dict = OrderedDict()
+    new_ids_dict = OrderedDict()
     # we sort each time the whole set in case someone manually changed something
     # it shouldn't take too much time
-    # new_ids_dict['scripts'] = sort(scripts_list)
-    # new_ids_dict['playbooks'] = sort(playbooks_list)
-    # new_ids_dict['integrations'] = sort(integration_list)
-    # new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
-    # new_ids_dict['Classifiers'] = sort(classifiers_list)
-    # new_ids_dict['Dashboards'] = sort(dashboards_list)
-    # new_ids_dict['IncidentFields'] = sort(incident_fields_list)
-    # new_ids_dict['IncidentTypes'] = sort(incident_type_list)
-    # new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
-    # new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
-    # new_ids_dict['Layouts'] = sort(layouts_list)
-    # new_ids_dict['Reports'] = sort(reports_list)
-    # new_ids_dict['Widgets'] = sort(widgets_list)
-    # new_ids_dict['Mappers'] = sort(mappers_list)
+    new_ids_dict['scripts'] = sort(scripts_list)
+    new_ids_dict['playbooks'] = sort(playbooks_list)
+    new_ids_dict['integrations'] = sort(integration_list)
+    new_ids_dict['TestPlaybooks'] = sort(testplaybooks_list)
+    new_ids_dict['Classifiers'] = sort(classifiers_list)
+    new_ids_dict['Dashboards'] = sort(dashboards_list)
+    new_ids_dict['IncidentFields'] = sort(incident_fields_list)
+    new_ids_dict['IncidentTypes'] = sort(incident_type_list)
+    new_ids_dict['IndicatorFields'] = sort(indicator_fields_list)
+    new_ids_dict['IndicatorTypes'] = sort(indicator_types_list)
+    new_ids_dict['Layouts'] = sort(layouts_list)
+    new_ids_dict['Reports'] = sort(reports_list)
+    new_ids_dict['Widgets'] = sort(widgets_list)
+    new_ids_dict['Mappers'] = sort(mappers_list)
     # print(f'\n\n\ntime after initializing new_ids_dict: {datetime.now().time()}\n\n\n')
     # if id_set_path:
     #     with open(id_set_path, 'w+') as id_set_file:
