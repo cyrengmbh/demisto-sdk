@@ -2,6 +2,7 @@ import glob
 import json
 import os
 from pathlib import Path
+from typing import List, Union
 
 import pytest
 from demisto_sdk.commands.common import tools
@@ -12,12 +13,12 @@ from demisto_sdk.commands.common.constants import (INTEGRATIONS_DIR,
                                                    TEST_PLAYBOOKS_DIR,
                                                    FileType)
 from demisto_sdk.commands.common.git_tools import git_path
-from demisto_sdk.commands.common.tools import (LOG_COLORS,
+from demisto_sdk.commands.common.tools import (LOG_COLORS, arg_to_list,
                                                filter_files_by_type,
                                                filter_files_on_pack,
                                                filter_packagify_changes,
                                                find_type, get_code_lang,
-                                               get_depth, get_dict_from_file,
+                                               get_dict_from_file,
                                                get_entity_id_by_entity_type,
                                                get_entity_name_by_entity_type,
                                                get_file, get_files_in_dir,
@@ -163,10 +164,6 @@ class TestGenericFunctions:
         files = filter_files_by_type(files, types)
 
         assert files == output
-
-    @pytest.mark.parametrize('data, output', [({'a': {'b': {'c': 3}}}, 3), ('a', 0), ([1, 2], 1)])
-    def test_get_depth(self, data, output):
-        assert get_depth(data) == output
 
     @pytest.mark.parametrize('path, output', [('demisto.json', 'json'), ('wow', '')])
     def test_retrieve_file_ending(self, path, output):
@@ -601,3 +598,30 @@ def test_get_ignore_pack_tests__ignore_missing_test(tmpdir, mocker):
 
     ignore_test_set = get_ignore_pack_skipped_tests(fake_pack_name)
     assert len(ignore_test_set) == 0
+
+
+@pytest.mark.parametrize(argnames="arg, expected_result",
+                         argvalues=[["a1,b2,c3", ['a1', 'b2', 'c3']],
+                                    ["[\"a1\",\"b2\",\"c3\"]", ["a1", "b2", "c3"]],
+                                    [['a1', 'b2', 'c3'], ['a1', 'b2', 'c3']],
+                                    ["", []],
+                                    [[], []]
+                                    ])
+def test_arg_to_list(arg: Union[List[str], str], expected_result: List[str]):
+    """
+        Given
+        - String or list of strings.
+        Case a: comma-separated string.
+        Case b: a string representing a list.
+        Case c: python list.
+        Case d: empty string.
+        Case e: empty list.
+
+        When
+        - Convert given string to list of strings, for example at unify.add_contributors_support.
+
+        Then:
+        - Ensure a Python list is returned with the relevant values.
+        """
+    func_result = arg_to_list(arg=arg, separator=",")
+    assert func_result == expected_result
