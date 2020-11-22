@@ -1126,7 +1126,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_integrations_paths()):
                 integration_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Playbooks' in objects_to_create:
             print_color("\nStarting iteration over Playbooks", LOG_COLORS.GREEN)
@@ -1138,7 +1138,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_playbooks_paths()):
                 playbooks_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Scripts' in objects_to_create:
             print_color("\nStarting iteration over Scripts", LOG_COLORS.GREEN)
@@ -1148,7 +1148,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(SCRIPTS_DIR)):
                 scripts_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'TestPlaybooks' in objects_to_create:
             print_color("\nStarting iteration over TestPlaybooks", LOG_COLORS.GREEN)
@@ -1161,7 +1161,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                 if pair[1]:
                     scripts_list.append(pair[1])
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Classifiers' in objects_to_create:
             print_color("\nStarting iteration over Classifiers", LOG_COLORS.GREEN)
@@ -1173,7 +1173,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(CLASSIFIERS_DIR)):
                 classifiers_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Dashboards' in objects_to_create:
             print_color("\nStarting iteration over Dashboards", LOG_COLORS.GREEN)
@@ -1185,7 +1185,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(DASHBOARDS_DIR)):
                 dashboards_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'IncidentTypes' in objects_to_create:
             print_color("\nStarting iteration over Incident Types", LOG_COLORS.GREEN)
@@ -1197,7 +1197,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(INCIDENT_TYPES_DIR)):
                 incident_type_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         # Has to be called after 'IncidentTypes' is called
         if 'IncidentFields' in objects_to_create:
@@ -1209,7 +1209,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(INCIDENT_FIELDS_DIR)):
                 incident_fields_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'IndicatorFields' in objects_to_create:
             print_color("\nStarting iteration over Indicator Fields", LOG_COLORS.GREEN)
@@ -1221,7 +1221,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(INDICATOR_FIELDS_DIR)):
                 indicator_fields_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         # Has to be called after 'Integrations' is called
         if 'IndicatorTypes' in objects_to_create:
@@ -1233,7 +1233,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(INDICATOR_TYPES_DIR)):
                 indicator_types_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Layouts' in objects_to_create:
             print_color("\nStarting iteration over Layouts", LOG_COLORS.GREEN)
@@ -1252,7 +1252,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(LAYOUTS_DIR)):
                 layouts_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Reports' in objects_to_create:
             print_color("\nStarting iteration over Reports", LOG_COLORS.GREEN)
@@ -1264,7 +1264,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(REPORTS_DIR)):
                 reports_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Widgets' in objects_to_create:
             print_color("\nStarting iteration over Widgets", LOG_COLORS.GREEN)
@@ -1276,7 +1276,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(WIDGETS_DIR)):
                 widgets_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
         if 'Mappers' in objects_to_create:
             print_color("\nStarting iteration over Mappers", LOG_COLORS.GREEN)
@@ -1288,7 +1288,7 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
                                 get_general_paths(MAPPERS_DIR)):
                 mappers_list.extend(arr)
 
-        # progress_bar.update(1)
+        progress_bar.update(1)
 
     #
     new_ids_dict = OrderedDict()
