@@ -1117,178 +1117,178 @@ def re_create_id_set(id_set_path: Optional[str] = DEFAULT_ID_SET_PATH, objects_t
     print_color("Starting the creation of the id_set", LOG_COLORS.GREEN)
     print(f"\n\n\nstartiing with, memory used: {get_memory()}\n\n\n")
     print(f"\n\n\nobjects_to_create: {objects_to_create}\n\n\n")
-    # with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
-    if 'Integrations' in objects_to_create:
-        print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_integration,
-                                    print_logs=print_logs
-                                    ),
-                            get_integrations_paths()):
-            integration_list.extend(arr)
+    with click.progressbar(length=len(objects_to_create), label="Progress of id set creation") as progress_bar:
+        if 'Integrations' in objects_to_create:
+            print_color("\nStarting iteration over Integrations", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_integration,
+                                        print_logs=print_logs
+                                        ),
+                                get_integrations_paths()):
+                integration_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Playbooks' in objects_to_create:
-        print_color("\nStarting iteration over Playbooks", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.PLAYBOOK,),
-                                    data_extraction_func=get_playbook_data,
-                                    ),
-                            get_playbooks_paths()):
-            playbooks_list.extend(arr)
+        if 'Playbooks' in objects_to_create:
+            print_color("\nStarting iteration over Playbooks", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.PLAYBOOK,),
+                                        data_extraction_func=get_playbook_data,
+                                        ),
+                                get_playbooks_paths()):
+                playbooks_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Scripts' in objects_to_create:
-        print_color("\nStarting iteration over Scripts", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_script,
-                                    print_logs=print_logs
-                                    ),
-                            get_general_paths(SCRIPTS_DIR)):
-            scripts_list.extend(arr)
+        if 'Scripts' in objects_to_create:
+            print_color("\nStarting iteration over Scripts", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_script,
+                                        print_logs=print_logs
+                                        ),
+                                get_general_paths(SCRIPTS_DIR)):
+                scripts_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'TestPlaybooks' in objects_to_create:
-        print_color("\nStarting iteration over TestPlaybooks", LOG_COLORS.GREEN)
-        for pair in pool.map(partial(process_test_playbook_path,
-                                     print_logs=print_logs
-                                     ),
-                             get_general_paths(TEST_PLAYBOOKS_DIR)):
-            if pair[0]:
-                testplaybooks_list.append(pair[0])
-            if pair[1]:
-                scripts_list.append(pair[1])
+        if 'TestPlaybooks' in objects_to_create:
+            print_color("\nStarting iteration over TestPlaybooks", LOG_COLORS.GREEN)
+            for pair in pool.map(partial(process_test_playbook_path,
+                                         print_logs=print_logs
+                                         ),
+                                 get_general_paths(TEST_PLAYBOOKS_DIR)):
+                if pair[0]:
+                    testplaybooks_list.append(pair[0])
+                if pair[1]:
+                    scripts_list.append(pair[1])
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Classifiers' in objects_to_create:
-        print_color("\nStarting iteration over Classifiers", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.CLASSIFIER, FileType.OLD_CLASSIFIER),
-                                    data_extraction_func=get_classifier_data,
-                                    ),
-                            get_general_paths(CLASSIFIERS_DIR)):
-            classifiers_list.extend(arr)
+        if 'Classifiers' in objects_to_create:
+            print_color("\nStarting iteration over Classifiers", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.CLASSIFIER, FileType.OLD_CLASSIFIER),
+                                        data_extraction_func=get_classifier_data,
+                                        ),
+                                get_general_paths(CLASSIFIERS_DIR)):
+                classifiers_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Dashboards' in objects_to_create:
-        print_color("\nStarting iteration over Dashboards", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.DASHBOARD,),
-                                    data_extraction_func=get_general_data,
-                                    ),
-                            get_general_paths(DASHBOARDS_DIR)):
-            dashboards_list.extend(arr)
+        if 'Dashboards' in objects_to_create:
+            print_color("\nStarting iteration over Dashboards", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.DASHBOARD,),
+                                        data_extraction_func=get_general_data,
+                                        ),
+                                get_general_paths(DASHBOARDS_DIR)):
+                dashboards_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'IncidentTypes' in objects_to_create:
-        print_color("\nStarting iteration over Incident Types", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.INCIDENT_TYPE,),
-                                    data_extraction_func=get_incident_type_data,
-                                    ),
-                            get_general_paths(INCIDENT_TYPES_DIR)):
-            incident_type_list.extend(arr)
+        if 'IncidentTypes' in objects_to_create:
+            print_color("\nStarting iteration over Incident Types", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.INCIDENT_TYPE,),
+                                        data_extraction_func=get_incident_type_data,
+                                        ),
+                                get_general_paths(INCIDENT_TYPES_DIR)):
+                incident_type_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    # Has to be called after 'IncidentTypes' is called
-    if 'IncidentFields' in objects_to_create:
-        print_color("\nStarting iteration over Incident Fields", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_incident_fields,
-                                    print_logs=print_logs,
-                                    incidents_types_list=incident_type_list
-                                    ),
-                            get_general_paths(INCIDENT_FIELDS_DIR)):
-            incident_fields_list.extend(arr)
+        # Has to be called after 'IncidentTypes' is called
+        if 'IncidentFields' in objects_to_create:
+            print_color("\nStarting iteration over Incident Fields", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_incident_fields,
+                                        print_logs=print_logs,
+                                        incidents_types_list=incident_type_list
+                                        ),
+                                get_general_paths(INCIDENT_FIELDS_DIR)):
+                incident_fields_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'IndicatorFields' in objects_to_create:
-        print_color("\nStarting iteration over Indicator Fields", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.INDICATOR_FIELD,),
-                                    data_extraction_func=get_general_data,
-                                    ),
-                            get_general_paths(INDICATOR_FIELDS_DIR)):
-            indicator_fields_list.extend(arr)
+        if 'IndicatorFields' in objects_to_create:
+            print_color("\nStarting iteration over Indicator Fields", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.INDICATOR_FIELD,),
+                                        data_extraction_func=get_general_data,
+                                        ),
+                                get_general_paths(INDICATOR_FIELDS_DIR)):
+                indicator_fields_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    # Has to be called after 'Integrations' is called
-    if 'IndicatorTypes' in objects_to_create:
-        print_color("\nStarting iteration over Indicator Types", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_indicator_types,
-                                    print_logs=print_logs,
-                                    all_integrations=integration_list
-                                    ),
-                            get_general_paths(INDICATOR_TYPES_DIR)):
-            indicator_types_list.extend(arr)
+        # Has to be called after 'Integrations' is called
+        if 'IndicatorTypes' in objects_to_create:
+            print_color("\nStarting iteration over Indicator Types", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_indicator_types,
+                                        print_logs=print_logs,
+                                        all_integrations=integration_list
+                                        ),
+                                get_general_paths(INDICATOR_TYPES_DIR)):
+                indicator_types_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Layouts' in objects_to_create:
-        print_color("\nStarting iteration over Layouts", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.LAYOUT,),
-                                    data_extraction_func=get_layout_data,
-                                    ),
-                            get_general_paths(LAYOUTS_DIR)):
-            layouts_list.extend(arr)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.LAYOUTS_CONTAINER,),
-                                    data_extraction_func=get_layoutscontainer_data,
-                                    ),
-                            get_general_paths(LAYOUTS_DIR)):
-            layouts_list.extend(arr)
+        if 'Layouts' in objects_to_create:
+            print_color("\nStarting iteration over Layouts", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.LAYOUT,),
+                                        data_extraction_func=get_layout_data,
+                                        ),
+                                get_general_paths(LAYOUTS_DIR)):
+                layouts_list.extend(arr)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.LAYOUTS_CONTAINER,),
+                                        data_extraction_func=get_layoutscontainer_data,
+                                        ),
+                                get_general_paths(LAYOUTS_DIR)):
+                layouts_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Reports' in objects_to_create:
-        print_color("\nStarting iteration over Reports", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.REPORT,),
-                                    data_extraction_func=get_general_data,
-                                    ),
-                            get_general_paths(REPORTS_DIR)):
-            reports_list.extend(arr)
+        if 'Reports' in objects_to_create:
+            print_color("\nStarting iteration over Reports", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.REPORT,),
+                                        data_extraction_func=get_general_data,
+                                        ),
+                                get_general_paths(REPORTS_DIR)):
+                reports_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Widgets' in objects_to_create:
-        print_color("\nStarting iteration over Widgets", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.WIDGET,),
-                                    data_extraction_func=get_widget_data,
-                                    ),
-                            get_general_paths(WIDGETS_DIR)):
-            widgets_list.extend(arr)
+        if 'Widgets' in objects_to_create:
+            print_color("\nStarting iteration over Widgets", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.WIDGET,),
+                                        data_extraction_func=get_widget_data,
+                                        ),
+                                get_general_paths(WIDGETS_DIR)):
+                widgets_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
-    if 'Mappers' in objects_to_create:
-        print_color("\nStarting iteration over Mappers", LOG_COLORS.GREEN)
-        for arr in pool.map(partial(process_general_items,
-                                    print_logs=print_logs,
-                                    expected_file_types=(FileType.MAPPER,),
-                                    data_extraction_func=get_mapper_data,
-                                    ),
-                            get_general_paths(MAPPERS_DIR)):
-            mappers_list.extend(arr)
+        if 'Mappers' in objects_to_create:
+            print_color("\nStarting iteration over Mappers", LOG_COLORS.GREEN)
+            for arr in pool.map(partial(process_general_items,
+                                        print_logs=print_logs,
+                                        expected_file_types=(FileType.MAPPER,),
+                                        data_extraction_func=get_mapper_data,
+                                        ),
+                                get_general_paths(MAPPERS_DIR)):
+                mappers_list.extend(arr)
 
-    # progress_bar.update(1)
+        # progress_bar.update(1)
 
     #
     new_ids_dict = OrderedDict()
