@@ -81,6 +81,9 @@ class FileType(Enum):
     PYTHON_FILE = 'pythonfile'
     JAVSCRIPT_FILE = 'javascriptfile'
     POWERSHELL_FILE = 'powershellfile'
+    CONF_JSON = 'confjson'
+    METADATA = 'metadata'
+    WHITE_LIST = 'whitelist'
 
 
 ENTITY_TYPE_TO_DIR = {
