@@ -25,8 +25,8 @@ jobs:
         - image: circleci/python:3.8.3-buster-node
       steps:
         - checkout
-        - restore_cache:
-            key: tox-37-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+#        - restore_cache:
+#            key: tox-37-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
         - run:
             # install npm modules so readme tests run with mdx verification
             name: npm install
@@ -51,8 +51,8 @@ jobs:
         - image: circleci/python:3.8.3-buster-node
       steps:
         - checkout
-        - restore_cache:
-            key: tox-38-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+#        - restore_cache:
+#            key: tox-38-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
         - run:
             # install npm modules so readme tests run with mdx verification
             name: npm install
@@ -124,8 +124,8 @@ jobs:
         - checkout
         - attach_workspace:
             at: ~/project
-        - restore_cache:
-            key: tox-38-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+#        - restore_cache:
+#            key: tox-38-cache-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
         - run:
             name: Test validate files and yaml
             when: always
