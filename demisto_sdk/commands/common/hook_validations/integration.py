@@ -773,6 +773,10 @@ class IntegrationValidator(ContentEntityValidator):
             correct_name = " v2"
             if not display_name.endswith(correct_name):  # type: ignore
                 error_message, error_code = Errors.invalid_v2_integration_name()
+                error_message += f"\nname: {self.current_file.get('name', '')}\n" \
+                                 f"display: {self.current_file.get('display', '')}" \
+                                 f"isError: {is_v2_file(self.current_file, check_in_display=True)}"
+
                 if self.handle_error(error_message, error_code, file_path=self.file_path):
                     return False
 

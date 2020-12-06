@@ -1463,6 +1463,8 @@ def is_v2_file(current_file, check_in_display=False):
         name = current_file.get('display', '')
     else:
         name = current_file.get('name', '')
+    if name == 'VMware Carbon Black EDR':
+        print("@#@#@#@#@#@#@#$@#$@#$@#$#$@#$@$@#$@")
     suffix = str(name[-2:].lower())
     if suffix != "v2":
         return False
