@@ -20,8 +20,8 @@ from demisto_sdk.commands.common.tools import (filter_files_by_type,
                                                get_pack_name, print_error,
                                                print_warning)
 from demisto_sdk.commands.common.update_id_set import merge_id_sets_from_files
-from demisto_sdk.commands.create_artifacts.content_artifacts_creator import (
-    ArtifactsManager, create_content_artifacts)
+from demisto_sdk.commands.create_artifacts.content_artifacts_creator import \
+    ArtifactsManager
 from demisto_sdk.commands.create_id_set.create_id_set import IDSetCreator
 from demisto_sdk.commands.download.downloader import Downloader
 from demisto_sdk.commands.find_dependencies.find_dependencies import \
@@ -174,8 +174,8 @@ def extract_code(config, **kwargs):
 @main.command(
     name="unify",
     short_help='Unify code, image, description and yml files to a single Demisto yml file. Note that '
-    'this should be used on a single integration/script and not a pack '
-    'not multiple scripts/integrations')
+               'this should be used on a single integration/script and not a pack '
+               'not multiple scripts/integrations')
 @click.help_option(
     '-h', '--help'
 )
@@ -201,7 +201,7 @@ def unify(**kwargs):
 # ====================== validate ====================== #
 @main.command(
     short_help='Validate your content files. If no additional flags are given, will validated only '
-    'committed files'
+               'committed files'
 )
 @click.help_option(
     '-h', '--help'
@@ -324,9 +324,36 @@ def validate(config, **kwargs):
 @click.option('--cpus',
               help='Number of cpus/vcpus availble - only required when os not reflect number of cpus (CircleCI'
                    'allways show 32, but medium has 3.', hidden=True, default=os.cpu_count())
-def create_arifacts(**kwargs) -> int:
+@click.option('-bn', '--bucket_name', help='Storage bucket name')
+@click.option('-sa', '--service_account',
+              help=('Path to gcloud service account, is for circleCI usage. '
+                    'For local development use your personal account and '
+                    'authenticate using Google Cloud SDK by running: '
+                    '`gcloud auth application-default login` and leave this parameter blank. '
+                    'For more information go to: '
+                    'https://googleapis.dev/python/google-api-core/latest/auth.html'))
+@click.option('-isp', '--id_set_path', help='The full path of id_set.json')
+@click.option('-p', '--pack_names',
+              help=("Packs to create artifacts for. Optional values are: `all` or "
+                    "csv list of packs. "
+                    "Default is set to `all`"),
+              default="All")
+@click.option('-cbn', '--ci_build_number',
+              help='CircleCi build number (will be used as hash revision at index file)')
+@click.option('-op', '--override_all_packs', help='Override all existing packs in cloud storage',
+              is_flag=True)
+@click.option('-k', '--key_string', help='Base64 encoded signature key used for signing packs.')
+@click.option('-sb', '--storage_base_path', help='Storage base path of the directory to upload to.')
+@click.option('-rt', '--remove_test_playbooks', is_flag=True,
+              help='Should remove test playbooks from content packs or not.')
+@click.option('-bu', '--bucket_upload', help='is bucket upload build?', is_flag=True)
+@click.option('-pb', '--private_bucket_name', help="Private storage bucket name")
+@click.option('-c', '--circle_branch', help='CircleCi branch of current build')
+@click.option('-f', '--force_upload', help='Is force upload build?', is_flag=True)
+@click.option('-o', '--output_files', help='Whether to output the files.', is_flag=True)
+def create_artifacts(**kwargs) -> int:
     artifacts_conf = ArtifactsManager(**kwargs)
-    return create_content_artifacts(artifacts_conf)
+    return artifacts_conf.create_content_artifacts()
 
 
 # ====================== secrets ====================== #
@@ -402,7 +429,8 @@ def secrets(config, **kwargs):
 @click.option("-lp", "--log-path", help="Path to store all levels of logs",
               type=click.Path(exists=True, resolve_path=True))
 def lint(input: str, git: bool, all_packs: bool, verbose: int, quiet: bool, parallel: int, no_flake8: bool,
-         no_bandit: bool, no_mypy: bool, no_vulture: bool, no_xsoar_linter: bool, no_pylint: bool, no_test: bool, no_pwsh_analyze: bool,
+         no_bandit: bool, no_mypy: bool, no_vulture: bool, no_xsoar_linter: bool, no_pylint: bool, no_test: bool,
+         no_pwsh_analyze: bool,
          no_pwsh_test: bool, keep_container: bool, prev_ver: str, test_xml: str, failure_report: str, log_path: str):
     """Lint command will perform:\n
         1. Package in host checks - flake8, bandit, mypy, vulture.\n
@@ -547,7 +575,7 @@ def download(**kwargs):
                            "the base path for the outputs that the script generates")
 @click.option(
     "-r", "--raw-response", help="Used with `json-to-outputs` flag. Use the raw response of the query for"
-    " `json-to-outputs`", is_flag=True)
+                                 " `json-to-outputs`", is_flag=True)
 def run(**kwargs):
     runner = Runner(**kwargs)
     return runner.run()
@@ -599,8 +627,9 @@ file/UI/PyCharm. This script auto generates the YAML for a command from the JSON
 @click.option(
     "-c", "--command", help="Command name (e.g. xdr-get-incidents)", required=True)
 @click.option(
-    "-i", "--input", help="Valid JSON file path. If not specified, the script will wait for user input in the terminal. "
-                          "The response can be obtained by running the command with `raw-response=true` argument.",
+    "-i", "--input",
+    help="Valid JSON file path. If not specified, the script will wait for user input in the terminal. "
+         "The response can be obtained by running the command with `raw-response=true` argument.",
     required=False)
 @click.option(
     "-p", "--prefix", help="Output prefix like Jira.Ticket, VirusTotal.IP, the base path for the outputs that the "
