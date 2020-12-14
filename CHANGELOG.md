@@ -48,6 +48,7 @@
 * Fixed an issue in the **validate** command where *--staged* flag did not bring only changed files.
 * Fixed the **update-release-notes** command to ignore changes in the metadata file.
 * Fixed the **validate** command to ignore metadata changes when checking if a version bump is needed.
+* Added new code validation for *NotImplementedError* to raise a warning in `XSOAR-linter`
 
 
 # 1.2.8
