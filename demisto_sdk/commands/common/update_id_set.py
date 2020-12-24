@@ -995,6 +995,24 @@ def get_integrations_paths(pack_to_create):
     return integration_files
 
 
+def get_playbooks_paths(pack_to_create):
+    if pack_to_create:
+        path_list = [
+            [pack_to_create, 'Playbooks', '*.yml']
+        ]
+
+    else:
+        path_list = [
+            ['Packs', '*', 'Playbooks', '*.yml']
+        ]
+
+    playbook_files = list(pack_to_create)
+    for path in path_list:
+        playbook_files.extend(glob.glob(os.path.join(*path)))
+
+    return playbook_files
+
+
 def process_packs(file_path: str, print_logs: bool) -> list:
     """
     Process a pack metadata file.
@@ -1012,24 +1030,6 @@ def process_packs(file_path: str, print_logs: bool) -> list:
     except Exception as exp:  # noqa
         print_error(f'failed to process {file_path}, Error: {str(exp)}')
         raise
-
-
-def get_playbooks_paths(pack_to_create):
-    if pack_to_create:
-        path_list = [
-            [pack_to_create, 'Playbooks', '*.yml']
-        ]
-
-    else:
-        path_list = [
-            ['Packs', '*', 'Playbooks', '*.yml']
-        ]
-
-    playbook_files = list(pack_to_create)
-    for path in path_list:
-        playbook_files.extend(glob.glob(os.path.join(*path)))
-
-    return playbook_files
 
 
 def get_general_paths(path, pack_to_create):
