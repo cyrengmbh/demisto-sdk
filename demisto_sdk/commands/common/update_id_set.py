@@ -759,6 +759,12 @@ def get_metadata_data(path):
         'certification': 'certified' if metadata_data.get('support', '').lower() in ['xsoar', 'partner'] else ''
     }
 
+    try:
+        id_ = path.split('/')[-2]
+        data['id'] = id_
+    except Exception:
+        pass
+
     return {data['name']: data}
 
 
