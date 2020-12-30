@@ -6,7 +6,7 @@ from demisto_sdk.commands.test_content.ParallelLoggingManager import \
 
 class TestParallelLoggingManager:
 
-    def test_queue_listener_sanity(self, tmp_path):
+    def test_queue_listener_sanity(self, tmp_path, capsys):
         """
         Given:
             - a ParallelLoggingManager
@@ -37,7 +37,7 @@ class TestParallelLoggingManager:
             thread_name, level, content = expected_in_log
             self.assert_log_line(log_line, thread_name, level, content)
 
-    def test_real_time_logger_sanity(self, tmp_path):
+    def test_real_time_logger_sanity(self, tmp_path, capsys):
         """
         Given:
             - a ParallelLoggingManager
@@ -50,6 +50,7 @@ class TestParallelLoggingManager:
         logging_manager = ParallelLoggingManager(log_file_path)
         expected_logs = self.get_expected_content('1')
         logging_manager.debug('debug1', real_time=True)
+        import pdb ; pdb.set_trace()
         self.assert_latest_log_line(log_file_path, *expected_logs['debug'])
         logging_manager.info('info1', real_time=True)
         self.assert_latest_log_line(log_file_path, *expected_logs['info'])
