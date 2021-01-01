@@ -28,7 +28,8 @@ from demisto_sdk.commands.test_content.mock_server import (RESULT, MITMProxy,
                                                            run_with_mock)
 from demisto_sdk.commands.test_content.ParallelLoggingManager import \
     ParallelLoggingManager
-from demisto_sdk.commands.test_content.tools import update_server_configuration
+from demisto_sdk.commands.test_content.tools import (
+    is_redhat_instance, update_server_configuration)
 from slack import WebClient as SlackClient
 
 ENV_RESULTS_PATH = './env_results.json'
@@ -1404,7 +1405,11 @@ class TestContext:
             The result of the test.
         """
         playbook_state = self._run_incident_test()
-        if playbook_state:
+        # We don't want to run docker tests on redhat instance because it does not use docker and it does not support
+        # the threshold configurations.
+        is_instance_using_docker = not is_redhat_instance(self.client.api_client.configuration.host.replace('https://',
+                                                                                                            ''))
+        if playbook_state and is_instance_using_docker:
             docker_test_results = self._run_docker_threshold_test()
             if not docker_test_results:
                 playbook_state = PB_Status.FAILED_DOCKER_TEST
@@ -1565,7 +1570,7 @@ class TestsExecution:
         """
         Iterates the mockable tests queue and executes them as long as there are tests to execute
         """
-        self.proxy.configure_proxy_in_demisto(proxy=self.proxy.ami.docker_ip + ':' + self.proxy.PROXY_PORT,
+        self.proxy.configure_proxy_in_demisto(proxy=self.proxy.ami.internal_ip + ':' + self.proxy.PROXY_PORT,
                                               username=self.build_context.secret_conf.server_username,
                                               password=self.build_context.secret_conf.server_password,
                                               server=self.server_url)
